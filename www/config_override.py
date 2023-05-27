@@ -6,7 +6,7 @@ configs = {
         'host': 'localhost',
         'port': 3306,
         'user': 'root',
-        'password': '270015',
+        'password': 'rootpassword',
         'db': 'web'
     }
 }
