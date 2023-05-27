@@ -13,8 +13,12 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  region = "us-east-1"
+  access_key = "AKIA5VS63UOQU4D5CILD"
+  secret_key = "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"
 }
+
+resource "random_pet" "sg" {}
 
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -38,6 +42,13 @@ resource "aws_security_group" "web-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] // replace this with your IP address for security
+  }
   // connectivity to ubuntu mirrors is required to run `apt-get update` and `apt-get install apache2`
   egress {
     from_port   = 0
@@ -48,24 +59,21 @@ resource "aws_security_group" "web-sg" {
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
-  security_groups = [aws_security_group.web-sg.id]
+  ami             = data.aws_ami.ubuntu.id
+  instance_type   = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.web-sg.id]
 
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
-              sudo apt-get install -y python3-pip git nginx
+              sudo apt-get install -y python3-pip git apache2
               git clone https://github.com/ZihaoLiu0927/python_web_dev.git
               cd python_web_dev
               pip3 install -r requirements.txt
-
               echo "mysql-server mysql-server/root_password password rootpassword" | sudo debconf-set-selections
               echo "mysql-server mysql-server/root_password_again password rootpassword" | sudo debconf-set-selections
               sudo apt-get install -y mysql-server
               mysql -u root -prootpassword < www/schema.sql
-
-              python3 www/app.py > webapp.log 2>&1 &
               EOF
 
   tags = {
@@ -76,3 +84,4 @@ resource "aws_instance" "web" {
 output "web-address" {
   value = "${aws_instance.web.public_dns}:8080"
 }
+
