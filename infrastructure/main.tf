@@ -80,9 +80,9 @@ resource "aws_instance" "web" {
               echo "mysql-server mysql-server/root_password password ${var.mysql_root_password}" | sudo debconf-set-selections
               echo "mysql-server mysql-server/root_password_again password ${var.mysql_root_password}" | sudo debconf-set-selections
               sudo apt-get install -y mysql-server
-              mysql -u root -prootpassword < www/schema.sql
-              export DB_PASSWORD=${var.mysql_root_password}
-              export ENVIRONMENT="production"
+              mysql -u root -p${var.mysql_root_password} < www/schema.sql
+              DB_PASSWORD=${var.mysql_root_password}
+              ENVIRONMENT="production"
               sudo python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
