@@ -7,7 +7,6 @@ def log(sql, args=()):
 
 async def create_pool(loop, **kw):
     logging.info('create database connection pool...')
-    print("password is: ", kw['password'])
     global __pool
     __pool = await aiomysql.create_pool(
         host=kw.get('host', '127.0.0.1'),

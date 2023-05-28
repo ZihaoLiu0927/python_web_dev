@@ -88,7 +88,7 @@ resource "aws_instance" "web" {
               echo $MYSQL_ROOT_PASSWORD >> /tmp/password.txt
               echo $ENVIRONMENT >> /tmp/password.txt
               echo $DB_PASSWORD >> /tmp/password.txt
-              sudo python3 www/app.py > /tmp/app_output.txt 2>&1 &
+              python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
   tags = {
