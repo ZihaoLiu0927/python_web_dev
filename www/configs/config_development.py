@@ -11,6 +11,8 @@ from configs.config_common import merge, toDict
 
 configs = configs.config_common.configs
 
+print("dev env: ", os.getenv('DB_PASSWORD'))
+
 dev_configs = {
     'debug': True,
     'db': {

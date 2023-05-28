@@ -8,6 +8,8 @@ from configs.config_common import merge, toDict
 
 configs = configs.config_common.configs
 
+print("prod env: ", os.getenv('DB_PASSWORD'))
+
 prod_configs = {
     'debug': False,
     'db': {
