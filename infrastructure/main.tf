@@ -77,11 +77,12 @@ resource "aws_instance" "web" {
               git clone https://github.com/ZihaoLiu0927/python_web_dev.git > /tmp/git_clone_output.txt 2>&1
               cd python_web_dev
               pip3 install -r requirements.txt
-              echo "mysql-server mysql-server/root_password password rootpassword" | sudo debconf-set-selections
-              echo "mysql-server mysql-server/root_password_again password rootpassword" | sudo debconf-set-selections
+              echo "mysql-server mysql-server/root_password password ${var.mysql_root_password}" | sudo debconf-set-selections
+              echo "mysql-server mysql-server/root_password_again password ${var.mysql_root_password}" | sudo debconf-set-selections
               sudo apt-get install -y mysql-server
               mysql -u root -prootpassword < www/schema.sql
-              ENVIRONMENT=production
+              export DB_PASSWORD=${var.mysql_root_password}
+              export ENVIRONMENT="production"
               sudo python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 

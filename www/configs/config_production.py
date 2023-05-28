@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
+import os
 import configs.config_common
 from configs.config_common import merge, toDict
 
@@ -13,7 +14,7 @@ prod_configs = {
         'host': 'localhost',
         'port': 3306,
         'user': 'root',
-        'password': 'rootpassword',
+        'password': os.getenv('DB_PASSWORD', 'default_password'),
         'db': 'web'
     },
 }
