@@ -83,6 +83,9 @@ resource "aws_instance" "web" {
               mysql -u root -p${var.mysql_root_password} < www/schema.sql
               DB_PASSWORD=${var.mysql_root_password}
               ENVIRONMENT="production"
+              echo ${var.mysql_root_password}, >> /tmp/password.txt
+              echo ${DB_PASSWORD}, >> /tmp/password.txt
+              echo ${ENVIRONMENT}, >> /tmp/password.txt
               sudo python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
