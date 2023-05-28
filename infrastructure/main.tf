@@ -1,11 +1,11 @@
 terraform {
-  # cloud {
-  #   organization = "test-zlh"
+  cloud {
+    organization = "test-zlh"
 
-  #   workspaces {
-  #     name = "test"
-  #   }
-  # }
+    workspaces {
+      name = "test"
+    }
+  }
 
   required_providers {
     aws = {
@@ -22,8 +22,6 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
-  access_key = "AKIA5VS63UOQ5GSJYTZQ"
-  secret_key = "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"
 }
 
 resource "random_pet" "sg" {}
@@ -74,32 +72,17 @@ resource "aws_instance" "web" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update -y
-              sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release -y
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-              echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-              sudo apt-get update -y
-              sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-
+              sudo apt-get install -y python3-pip git apache2
               cd /home/ubuntu
               git clone https://github.com/ZihaoLiu0927/python_web_dev.git > /tmp/git_clone_output.txt 2>&1
               cd python_web_dev
-
-              sudo docker network create mynetwork
-              sudo docker run \
-                --name mysql \
-                --network mynetwork \
-                -p 3306:3306 \
-                -e MYSQL_ROOT_PASSWORD=123456 \
-                -d mysql
-              sudo docker cp www/schema.sql mysql:/schema.sql
-              until sudo docker exec -i mysql mysql -uroot -p123456 -e "SELECT 1" >/dev/null 2>&1; do
-                  echo "Waiting for database connection..."
-                  sleep 2
-              done
-              sudo docker exec -i mysql mysql -u root -p123456 < www/schema.sql
-
-              docker build -t my-python-app .
-              docker run --name my-python-app --network mynetwork -p 8080:8080 -d my-python-app
+              pip3 install -r requirements.txt
+              echo "mysql-server mysql-server/root_password password rootpassword" | sudo debconf-set-selections
+              echo "mysql-server mysql-server/root_password_again password rootpassword" | sudo debconf-set-selections
+              sudo apt-get install -y mysql-server
+              mysql -u root -prootpassword < www/schema.sql
+              export ENVIRONMENT=production
+              python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
   tags = {
