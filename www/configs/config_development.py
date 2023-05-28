@@ -17,7 +17,7 @@ dev_configs = {
         'host': 'localhost',
         'port': 3306,
         'user': 'root',
-        'password': os.getenv('DB_PASSWORD', 'default_password'),
+        'password': os.getenv('DB_PASSWORD'),
         'db': 'web'
     },
 }
