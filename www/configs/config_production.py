@@ -13,7 +13,7 @@ prod_configs = {
         'host': 'mysql',
         'port': 3306,
         'user': 'root',
-        'password': 'rootpassword',
+        'password': '123456',
         'db': 'web'
     },
 }

@@ -74,38 +74,32 @@ resource "aws_instance" "web" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update -y
-              sudo apt-get install \
-                git \
-                apt-transport-https \
-                ca-certificates \
-                curl \
-                gnupg-agent \
-                software-properties-common -y
-              
-              "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
-              sudo add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'
-              sudo apt-get update
-              sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-              sudo systemctl status docker
+              sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release -y
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+              echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+              sudo apt-get update -y
+              sudo apt-get install docker-ce docker-ce-cli containerd.io -y
 
               cd /home/ubuntu
               git clone https://github.com/ZihaoLiu0927/python_web_dev.git > /tmp/git_clone_output.txt 2>&1
               cd python_web_dev
 
-              docker pull mysql
-              docker run \
+              sudo docker network create mynetwork
+              sudo docker run \
                 --name mysql \
-                -v /Users/zach/Downloads/mysqldb:/var/lib/ \
                 --network mynetwork \
                 -p 3306:3306 \
                 -e MYSQL_ROOT_PASSWORD=123456 \
                 -d mysql
-              
-              cat www/schema.sql | docker exec -i mysql mysql -u root -p123456
+              sudo docker cp www/schema.sql mysql:/schema.sql
+              until sudo docker exec -i mysql mysql -uroot -p123456 -e "SELECT 1" >/dev/null 2>&1; do
+                  echo "Waiting for database connection..."
+                  sleep 2
+              done
+              sudo docker exec -i mysql mysql -u root -p123456 < www/schema.sql
 
               docker build -t my-python-app .
-              docker run --name my-python-app --network
-              mynetwork -p 8080:8080 -d my-python-app
+              docker run --name my-python-app --network mynetwork -p 8080:8080 -d my-python-app
               EOF
 
   tags = {
