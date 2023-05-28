@@ -4,7 +4,7 @@
 
 ' url handlers '
 
-import re, time, json, logging, hashlib, base64, asyncio
+import re, time, json, logging, hashlib, base64, asyncio, os
 
 from coroweb import get, post
 
@@ -12,11 +12,16 @@ import markdown2
 
 from aiohttp import web
 
-from config import configs
-
 from models import User, Blog, Comment, next_id
 
 from apis import APIValueError, APIError, APIPermissionError, APIResourceNotFoundError, Page
+
+env = os.environ.get('ENVIRONMENT')
+
+if env == 'prodcution':
+    from configs.config_production import configs
+else:
+    from configs.config_development import configs
 
 COOKIE_NAME = 'mysession'
 _COOKIE_KEY = configs.session.secret

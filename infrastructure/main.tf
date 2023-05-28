@@ -1,4 +1,12 @@
 terraform {
+  # cloud {
+  #   organization = "test-zlh"
+
+  #   workspaces {
+  #     name = "test"
+  #   }
+  # }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -14,8 +22,8 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
-  access_key = "AKIA5VS63UOQU4D5CILD"
-  secret_key = "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"
+  access_key = "AKIA5VS63UOQ5GSJYTZQ"
+  secret_key = "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"
 }
 
 resource "random_pet" "sg" {}
@@ -65,19 +73,43 @@ resource "aws_instance" "web" {
 
   user_data = <<-EOF
               #!/bin/bash
+              sudo apt-get update -y
+              sudo apt-get install \
+                git \
+                apt-transport-https \
+                ca-certificates \
+                curl \
+                gnupg-agent \
+                software-properties-common -y
+              
+              "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
+              sudo add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'
               sudo apt-get update
-              sudo apt-get install -y python3-pip git apache2
-              git clone https://github.com/ZihaoLiu0927/python_web_dev.git
+              sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+              sudo systemctl status docker
+
+              cd /home/ubuntu
+              git clone https://github.com/ZihaoLiu0927/python_web_dev.git > /tmp/git_clone_output.txt 2>&1
               cd python_web_dev
-              pip3 install -r requirements.txt
-              echo "mysql-server mysql-server/root_password password rootpassword" | sudo debconf-set-selections
-              echo "mysql-server mysql-server/root_password_again password rootpassword" | sudo debconf-set-selections
-              sudo apt-get install -y mysql-server
-              mysql -u root -prootpassword < www/schema.sql
+
+              docker pull mysql
+              docker run \
+                --name mysql \
+                -v /Users/zach/Downloads/mysqldb:/var/lib/ \
+                --network mynetwork \
+                -p 3306:3306 \
+                -e MYSQL_ROOT_PASSWORD=123456 \
+                -d mysql
+              
+              cat www/schema.sql | docker exec -i mysql mysql -u root -p123456
+
+              docker build -t my-python-app .
+              docker run --name my-python-app --network
+              mynetwork -p 8080:8080 -d my-python-app
               EOF
 
   tags = {
-    Name = "myblog"
+    Name = "blog"
   }
 }
 

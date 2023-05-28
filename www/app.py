@@ -17,7 +17,14 @@ from jinja2 import Environment, FileSystemLoader
 import orm
 from coroweb import add_routes, add_static
 from handlers import cookie2user, COOKIE_NAME
-from config import configs
+import os
+
+env = os.environ.get('ENVIRONMENT')
+
+if env == 'prodcution':
+    from configs.config_production import configs
+else:
+    from configs.config_development import configs
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
