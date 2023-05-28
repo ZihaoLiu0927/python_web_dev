@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - gitaction
+    paths-ignore:
+      - "README.md"
 
 env:
   TF_CLOUD_ORGANIZATION: "test-zlh"
