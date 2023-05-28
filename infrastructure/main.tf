@@ -84,10 +84,6 @@ resource "aws_instance" "web" {
               echo "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD" | sudo debconf-set-selections
               sudo apt-get install -y mysql-server
               mysql -u root -p$MYSQL_ROOT_PASSWORD < www/schema.sql
-              echo $MYSQL_ROOT_PASSWORD >> /tmp/password.txt
-              echo $MYSQL_ROOT_PASSWORD >> /tmp/password.txt
-              echo $ENVIRONMENT >> /tmp/password.txt
-              echo $DB_PASSWORD >> /tmp/password.txt
               python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
