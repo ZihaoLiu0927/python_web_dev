@@ -71,21 +71,22 @@ resource "aws_instance" "web" {
 
   user_data = <<-EOF
               #!/bin/bash
+              export ENVIRONMENT="production"
+              export MYSQL_ROOT_PASSWORD="${var.mysql_root_password}"
+              export DB_PASSWORD=$MYSQL_ROOT_PASSWORD
               sudo apt-get update -y
               sudo apt-get install -y python3-pip git apache2
               cd /home/ubuntu
               git clone https://github.com/ZihaoLiu0927/python_web_dev.git > /tmp/git_clone_output.txt 2>&1
               cd python_web_dev
               pip3 install -r requirements.txt
-              echo "mysql-server mysql-server/root_password password ${var.mysql_root_password}" | sudo debconf-set-selections
-              echo "mysql-server mysql-server/root_password_again password ${var.mysql_root_password}" | sudo debconf-set-selections
+              echo "mysql-server mysql-server/root_password password $MYSQL_ROOT_PASSWORD" | sudo debconf-set-selections
+              echo "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD" | sudo debconf-set-selections
               sudo apt-get install -y mysql-server
-              mysql -u root -p${var.mysql_root_password} < www/schema.sql
-              DB_PASSWORD=${var.mysql_root_password}
-              ENVIRONMENT="production"
-              echo ${var.mysql_root_password}, >> /tmp/password.txt
-              echo ${DB_PASSWORD}, >> /tmp/password.txt
-              echo ${ENVIRONMENT}, >> /tmp/password.txt
+              mysql -u root -p$MYSQL_ROOT_PASSWORD < www/schema.sql
+              echo $MYSQL_ROOT_PASSWORD >> /tmp/password.txt
+              echo $MYSQL_ROOT_PASSWORD >> /tmp/password.txt
+              echo $ENVIRONMENT >> /tmp/password.txt
               sudo python3 www/app.py > /tmp/app_output.txt 2>&1 &
               EOF
 
