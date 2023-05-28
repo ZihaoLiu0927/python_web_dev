@@ -16,7 +16,7 @@ from models import User, Blog, Comment, next_id
 
 from apis import APIValueError, APIError, APIPermissionError, APIResourceNotFoundError, Page
 
-env = os.environ.get('ENVIRONMENT')
+env = os.environ.get('ENVIRONMENT', "production")
 
 if env == 'prodcution':
     from configs.config_production import configs

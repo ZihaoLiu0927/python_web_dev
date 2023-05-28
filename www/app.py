@@ -19,7 +19,7 @@ from coroweb import add_routes, add_static
 from handlers import cookie2user, COOKIE_NAME
 import os
 
-env = os.environ.get('ENVIRONMENT')
+env = os.environ.get('ENVIRONMENT', "production")
 
 if env == 'prodcution':
     from configs.config_production import configs
