@@ -1,6 +1,6 @@
 # A Web Build Project
 
-The python_web_dev this is a project to practice full-stack web building! A demo App has been deployed to AWS where everyone can click the [App Link]([http://ec2-54-90-211-153.compute-1.amazonaws.com:8080/]) and take a look.
+The python_web_dev this is a project to practice full-stack web building! A demo App has been deployed to AWS where everyone can click the [App Link](http://ec2-54-90-211-153.compute-1.amazonaws.com:8080) and take a look.
 
 ## Description
 This Python web application is built using the aiohttp framework, providing a simple and efficient blog system for the web host author. The application allows the author to publish blogs, while readers can explore and engage with the blogs and articles by leaving comments.
